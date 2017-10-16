@@ -12,12 +12,11 @@
 ;;; a square-root procedure that uses this kind of end test. Does this
 ;;; work better for small and large numbers?
 
-(define (good-enough? guess x)
-  (< (abs (- (square guess) x)) 0.001))
-; Value: good-enough?
 
-;;; Q: The good-enough? test used in computing square roots will not be
-;;; very effective for finding the square roots of very small numbers.
+;;; Ad 1 For small numbers the difference between x and guess (even if
+;;; they differ by orders of magnitude) will be smaller than
+;;; the tolerance value 0.001 used in the test. good-enough?
+;;; will quickly return #t and prevents further averaging.
 
 ;;; Number: 4
 ;;;
@@ -44,14 +43,11 @@
 ;;;
 ;;; Pecentage Error is ~ 223%
 
-;;; A: For small numbers the difference between x and guess (even if
-;;; they differ by orders of magnitude) will be smaller than
-;;; the tolerance value 0.001 used in the test. good-enough?
-;;; will quickly return #t and prevents further averaging.
 
-;;; Q: Also, in real computers, arithmetic operations are almost always
-;;; performed with limited precision. This makes our test inadequate
-;;; for very large numbers.
+;;; Ad 2 The machine precision is unable to represent small differences
+;;; between large numbers. good-enough? will always return #f and
+;;; improve will always return same value. The algorithm will never
+;;; terminate.
 
 ;;; Very large number: 10000000000000
 ;;;
@@ -68,8 +64,49 @@
 ;;;   (average 3162277.6601683795 3162277.660168379)
 ;;;   ; Value: 3162277.6601683795
 
-;;; A: The machine precision is unable to represent small differences
-;;; between large numbers. good-enough? will always return #f and
-;;; improve will always return same value. The algorithm will never
-;;; terminate.
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x))
+     0.001))
+
+(define (abs x)
+  (if (< x 0) (- x) x))
+
+(define (square x) (* x x))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+;;; Ad 3 Alternative strategy
+(define (good-enough? guess x)
+  (<= (abs (- (improve guess x) guess))
+      (* 0.001 guess)))
+
+;;; Bonus: yet another alternative strategy
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x))
+     0.1)) 
+  
+(define (small-enough guess x)
+  (<= (- (square guess) x) 
+      (- (square (improve guess x)) x))) 
+  
+(define (sqrt-iter guess x) 
+  (if (good-enough? guess x) 
+      (if (small-enough guess x) 
+           guess 
+           (sqrt-iter (improve guess x) x))  
+      (sqrt-iter (improve guess x) x))) 
 
