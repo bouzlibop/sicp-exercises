@@ -64,6 +64,7 @@
 ;;;   (average 3162277.6601683795 3162277.660168379)
 ;;;   ; Value: 3162277.6601683795
 
+;;; Ad 3
 
 (define (sqrt x)
   (sqrt-iter 1.0 x))
@@ -77,6 +78,10 @@
 (define (good-enough? guess x)
   (< (abs (- (square guess) x))
      0.001))
+;;; Alternative strategy
+(define (good-enough? guess x)
+  (<= (abs (- (improve guess x) guess))
+      (* 0.001 guess)))
 
 (define (abs x)
   (if (< x 0) (- x) x))
@@ -89,23 +94,19 @@
 (define (average x y)
   (/ (+ x y) 2))
 
-;;; Ad 3 Alternative strategy
-(define (good-enough? guess x)
-  (<= (abs (- (improve guess x) guess))
-      (* 0.001 guess)))
+;;; Bonus: yet another alternative strategy - even better
 
-;;; Bonus: yet another alternative strategy
 (define (good-enough? guess x)
   (< (abs (- (square guess) x))
      0.1)) 
   
-(define (small-enough guess x)
+(define (small-enough? guess x)
   (<= (- (square guess) x) 
       (- (square (improve guess x)) x))) 
   
 (define (sqrt-iter guess x) 
   (if (good-enough? guess x) 
-      (if (small-enough guess x) 
+      (if (small-enough? guess x) 
            guess 
            (sqrt-iter (improve guess x) x))  
       (sqrt-iter (improve guess x) x))) 
