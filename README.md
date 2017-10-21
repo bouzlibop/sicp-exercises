@@ -7,6 +7,8 @@
   height="160px"
 />
 
+Work In Progress... [10/356]
+
 ## [List of Exercises][2]
 
 For reference, [the HTML version of the book][1] has a list of links to [all
